@@ -1,9 +1,9 @@
-#Kurulum
+# Kurulum
 ```
 npm install
 ```
 
-#Kullanım
+# Kullanım
 ```
 npm start [anahtar kelime]
 ```
