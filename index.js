@@ -1,6 +1,7 @@
 const pptr = require('puppeteer');
 const fs = require('fs');
 const axios = require('axios');
+const sharp = require('sharp')
 
 const text = process.argv[2];
 const pageIndex = "#width > div > div > div > div:nth-child(9) > div:nth-child(1) > div.noindex";
@@ -42,7 +43,7 @@ async function collectImages(page){
         }
         return resArray;
     });
-    for (let i = 0; i < results.length; i++) {
+    for (let i = 0; i <results.length; i++) {
         const url = 'https:' + results[i];
         const filePath = 'images/' + text + Date.now() + '.png';
         await download_image(url, filePath);
@@ -55,11 +56,17 @@ const download_image = (url, image_path) =>
     url,
     responseType: 'stream',
   }).then(
-    response =>
+    response => {
+        const resizer =
+        sharp()
+          .resize(300, 100, { fit: "fill"})
+          .png();
       new Promise((resolve, reject) => {
         response.data
+          .pipe(resizer)
           .pipe(fs.createWriteStream(image_path))
           .on('finish', () => resolve())
           .on('error', e => reject(e));
-      }),
-  );
+          resizer.on('finish', () => resolve()).on('error', e => reject(e));
+      });
+    });
